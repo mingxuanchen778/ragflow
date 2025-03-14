@@ -39,3 +39,8 @@ ECHO is off.
 ## 注意事项
 ECHO is off.
 Railway.app不支持多容器部署，因此我们需要禁用RAGFlow中的一些依赖服务。这种配置下，RAGFlow将只使用OpenRouter API进行文本生成，而不使用其他高级功能（如文档索引和搜索）。
+
+## 更新日志
+ECHO is off.
+- 2025-03-14: 初始版本
+- 2025-03-15: 测试Git凭据管理器

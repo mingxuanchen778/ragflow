@@ -1,0 +1,51 @@
+# Railway专用Dockerfile
+FROM ubuntu:22.04
+
+USER root
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /ragflow
+
+# 安装基本依赖
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装Python依赖
+COPY pyproject.toml /ragflow/
+COPY uv.lock /ragflow/
+RUN pip3 install --no-cache-dir -U pip setuptools wheel
+RUN pip3 install --no-cache-dir -e .
+
+# 复制应用代码
+COPY api /ragflow/api
+COPY conf /ragflow/conf
+COPY rag /ragflow/rag
+COPY web /ragflow/web
+
+# 复制Railway专用配置文件
+COPY railway_service_conf.yaml /ragflow/conf/service_conf.yaml
+
+# 创建启动脚本
+RUN echo '#!/bin/bash\n\
+\n\
+# 启动应用\n\
+python3 api/ragflow_server.py\n\
+' > /ragflow/start.sh
+
+RUN chmod +x /ragflow/start.sh
+
+# 设置环境变量
+ENV PYTHONPATH=/ragflow
+ENV PORT=9380
+
+# 暴露端口
+EXPOSE ${PORT}
+
+# 启动命令
+CMD ["/ragflow/start.sh"] 
